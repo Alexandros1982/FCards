@@ -200,8 +200,8 @@ html{
 .rpct{font-size:8px;font-weight:900;color:var(--gold);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
 
 /* ── SCREENS ── */
-.scr{display:none;padding:12px}
-.scr.on{display:block}
+.scr{display:none;flex-direction:column;height:100%;overflow:hidden}
+.scr.on{display:flex}
 
 /* ── STATS BAR (grid screen top) ── */
 .stats-bar{
@@ -1233,7 +1233,7 @@ html{
   </div>
 
   <!-- ΡΥΘΜΙΣΕΙΣ -->
-  <div class="scr" id="scr-settings">
+  <div class="scr" id="scr-settings" style="overflow-y:auto">
     <div class="set-sec">
       <div class="set-sec-ttl" id="lbl-set-support">Υποστήριξη</div>
       <div style="display:flex;gap:8px">
@@ -2085,7 +2085,7 @@ function renderGrid(){
           cell.style.padding='3px 2px';
           cell.innerHTML=
             '<span style="font-size:'+numSize+';font-weight:900;line-height:1;white-space:nowrap;text-align:center;display:block;width:100%">'+numStr+'</span>'+
-            '<span style="font-size:5px;opacity:.85;line-height:1.15;text-align:center;display:block;width:100%;white-space:normal;word-break:break-word">'+esc(pname)+'</span>';
+            '<span style="font-size:6.5px;opacity:.85;line-height:1.15;text-align:center;display:block;width:100%;white-space:normal;word-break:break-word">'+esc(pname)+'</span>';
         } else {
           cell.textContent=cardNum;
         }
@@ -2143,7 +2143,7 @@ function cellSingleClick(i){
       }
       updateWishBadge();
       saveState();
-    },220);
+    },400);
   }
 }
 function cellDoubleClick(i){
