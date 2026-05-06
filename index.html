@@ -1353,7 +1353,7 @@ html{
 
 <!-- TOOLBAR STRIP -->
 <div class="tbar" id="tbar">
-  <input type="number" id="jumpInput" placeholder="Μετάβαση σε κελί..." min="1">
+  <input type="text" id="jumpInput" placeholder="Μετάβαση σε κελί..." inputmode="text">
   <button class="tbtn p" onclick="doJump()">↵</button>
   <button class="tbtn d" id="lbl-btn-reset" onclick="doReset()">Reset</button>
 </div>
@@ -2008,12 +2008,22 @@ function pickIcon(id){
 function createCollection(){
   var name=document.getElementById('collNameInput').value.trim();
   if(!name){ toast(T('warn_name')); return; }
+  // FREE VERSION LIMIT: max 1 collection ever (even after deletion)
+  try{
+    if(localStorage.getItem('fcards_free_used')==='1'){
+      alert(lang==='el'
+        ?'⭐ Η δωρεάν έκδοση επιτρέπει μόνο 1 συλλογή.\n\nΑναβαθμίστε στο FCards Pro για απεριόριστες συλλογές!'
+        :'⭐ Free version allows only 1 collection.\n\nUpgrade to FCards Pro for unlimited collections!');
+      return;
+    }
+  }catch(e){}
   var total=parseInt(document.getElementById('totalInput').value)||100;
   var useGroups=document.getElementById('groupToggle').classList.contains('on');
   var groupSize=useGroups?(parseInt(document.getElementById('groupSizeInput').value)||10):total;
   var id='c_'+Date.now();
   var c={id:id,name:name,total:total,groupSize:groupSize,useGroups:useGroups,cells:Array(total).fill(false),groupNames:{},doubles:{}};
   var a=loadAll(); a[id]=c; saveAll(a);
+  try{ localStorage.setItem('fcards_free_used','1'); }catch(e){}
   toast(T('toast_created')+name);
   openColl(id);
 }
@@ -2410,12 +2420,20 @@ function closeOverlay(){
 
 /* ===================== JUMP / RESET ===================== */
 function doJump(){
-  var n=parseInt(document.getElementById('jumpInput').value);
-  if(n>=1&&n<=state.total){
-    document.querySelectorAll('.hl').forEach(function(el){ el.classList.remove('hl'); });
-    var el=document.getElementById('c_'+(n-1));
-    if(el){ el.classList.add('hl'); el.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(function(){ el.classList.remove('hl'); },2500); }
+  var val=document.getElementById('jumpInput').value.trim();
+  if(!val) return;
+  document.querySelectorAll('.hl').forEach(function(el){ el.classList.remove('hl'); });
+  var el=null;
+  var n=parseInt(val);
+  if(!isNaN(n) && n>=1 && n<=state.total){
+    el=document.getElementById('c_'+(n-1));
   }
+  if(!el && state.cardIndex){
+    var idx=state.cardIndex.findIndex(function(c){ return String(c).toUpperCase()===val.toUpperCase(); });
+    if(idx>=0) el=document.getElementById('c_'+idx);
+  }
+  if(el){ el.classList.add('hl'); el.scrollIntoView({behavior:'smooth',block:'center'}); setTimeout(function(){ el.classList.remove('hl'); },2500); }
+  else toast(lang==='el'?'⚠️ Δεν βρέθηκε κελί':'⚠️ Cell not found');
 }
 function doReset(){
   if(!confirm(T('confirm_reset'))) return;
@@ -2638,6 +2656,15 @@ function handleXlsxFile(input){
 
 function createFromXlsx(){
   if(!xlsxCardData || xlsxCardData.length===0){ toast('⚠️ Φόρτωσε πρώτα το Excel'); return; }
+  // FREE VERSION LIMIT
+  try{
+    if(localStorage.getItem('fcards_free_used')==='1'){
+      alert(lang==='el'
+        ?'⭐ Η δωρεάν έκδοση επιτρέπει μόνο 1 συλλογή.\n\nΑναβαθμίστε στο FCards Pro για απεριόριστες συλλογές!'
+        :'⭐ Free version allows only 1 collection.\n\nUpgrade to FCards Pro for unlimited collections!');
+      return;
+    }
+  }catch(e){}
   var name = document.getElementById('xlsxNameInput').value.trim() || 'Συλλογή Excel';
   var total = xlsxCardData.length;
 
@@ -2709,6 +2736,7 @@ function createFromXlsx(){
   };
 
   var all2=loadAll(); all2[id2]=coll; saveAll(all2);
+  try{ localStorage.setItem('fcards_free_used','1'); }catch(e){}
   toast('✅ '+name+' — '+total+' κάρτες, '+xlsxGroups.length+' ομάδες');
   xlsxCardData = null;
   openColl(id2);
