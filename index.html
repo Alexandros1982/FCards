@@ -2840,7 +2840,6 @@ function openLink(url){
   }
   requestFs();
   document.addEventListener('click', requestFs);
-  document.addEventListener('touchstart', requestFs);
 
   setTimeout(function(){
     intro.classList.add('fade-out');
@@ -2938,8 +2937,17 @@ document.addEventListener('touchstart', function(e){
 }, {passive:true});
 document.addEventListener('touchmove', function(e){
   var dy = e.touches[0].clientY - _startY;
-  // Αν τραβάμε προς τα κάτω (dy > 0) και είμαστε στην κορυφή, μπλοκάρουμε
-  if(dy > 0 && (document.documentElement.scrollTop === 0 || document.body.scrollTop === 0)){
+  var target = e.target;
+  var scrollable = false;
+  while(target && target !== document.body){
+    if(target.scrollHeight > target.clientHeight &&
+       (getComputedStyle(target).overflowY === 'auto' || getComputedStyle(target).overflowY === 'scroll')){
+      scrollable = true;
+      break;
+    }
+    target = target.parentElement;
+  }
+  if(!scrollable && dy > 0){
     e.preventDefault();
   }
 }, {passive:false});
