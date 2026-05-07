@@ -1815,7 +1815,7 @@ function exportFile(){
   var json=buildExportJSON(exportTargetId,true);
   if(!json){ toast('⚠️ Σφάλμα εξαγωγής'); return; }
   try{
-    var blob=new Blob([json],{type:'application/json'});
+    var blob=new Blob([json],{type:'application/octet-stream'});
     var url=URL.createObjectURL(blob);
     var lnk=document.createElement('a');
     lnk.href=url; lnk.download=fname+'.fcards'; lnk.style.display='none';
@@ -2839,7 +2839,6 @@ function openLink(url){
     }
   }
   requestFs();
-  document.addEventListener('click', requestFs);
 
   setTimeout(function(){
     intro.classList.add('fade-out');
