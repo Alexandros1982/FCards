@@ -1818,11 +1818,11 @@ function exportFile(){
     var blob=new Blob([json],{type:'application/octet-stream'});
     var url=URL.createObjectURL(blob);
     var lnk=document.createElement('a');
-    lnk.href=url; lnk.download=fname+'.fcards'; lnk.style.display='none';
+    lnk.href=url; lnk.download=fname+'.json'; lnk.style.display='none';
     document.body.appendChild(lnk); lnk.click();
     setTimeout(function(){ document.body.removeChild(lnk); URL.revokeObjectURL(url); },2000);
     closeExportOverlay();
-    toast(lang==='el'?'✅ Αποθηκεύτηκε: '+fname+'.fcards':'✅ Saved: '+fname+'.fcards');
+    toast(lang==='el'?'✅ Αποθηκεύτηκε: '+fname+'.json':'✅ Saved: '+fname+'.json');
   }catch(err){ toast('⚠️ '+err.message); }
 }
 
