@@ -1817,20 +1817,20 @@ function exportFile(){
   try{
     var blob=new Blob([json],{type:'application/octet-stream'});
     var file=new File([blob], fname+'.fcards', {type:'application/octet-stream'});
-    if(navigator.canShare && navigator.canShare({files:[file]})){
-      navigator.share({files:[file], title:'FCards Export'}).then(function(){
+    if(navigator.share){
+      navigator.share({
+        title:'FCards – '+fname,
+        text:lang==='el'?'Αντίγραφο ασφαλείας FCards':'FCards backup',
+        files:[file]
+      }).then(function(){
         closeExportOverlay();
-        toast(lang==='el'?'✅ Εξήχθη: '+fname+'.fcards':'✅ Exported: '+fname+'.fcards');
-      }).catch(function(){});
-      return;
+        toast(lang==='el'?'✅ Στάλθηκε!':'✅ Shared!');
+      }).catch(function(e){
+        if(e.name!=='AbortError') toast('⚠️ '+e.message);
+      });
+    } else {
+      toast(lang==='el'?'⚠️ Δεν υποστηρίζεται':'⚠️ Not supported');
     }
-    var url=URL.createObjectURL(blob);
-    var lnk=document.createElement('a');
-    lnk.href=url; lnk.download=fname+'.fcards'; lnk.style.display='none';
-    document.body.appendChild(lnk); lnk.click();
-    setTimeout(function(){ document.body.removeChild(lnk); URL.revokeObjectURL(url); },2000);
-    closeExportOverlay();
-    toast(lang==='el'?'✅ Αποθηκεύτηκε: '+fname+'.fcards':'✅ Saved: '+fname+'.fcards');
   }catch(err){ toast('⚠️ '+err.message); }
 }
 
