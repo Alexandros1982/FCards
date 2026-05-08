@@ -2023,7 +2023,6 @@ function createCollection(){
   var id='c_'+Date.now();
   var c={id:id,name:name,total:total,groupSize:groupSize,useGroups:useGroups,cells:Array(total).fill(false),groupNames:{},doubles:{}};
   var a=loadAll(); a[id]=c; saveAll(a);
-  try{ localStorage.setItem('fcards_free_used','1'); }catch(e){}
   toast(T('toast_created')+name);
   openColl(id);
 }
@@ -2135,6 +2134,8 @@ function cellSingleClick(i){
       delete clickTimers[i];
       state.cells[i]=true;
       updateCellUI(i);
+      // Set free flag when first card is collected
+      try{ localStorage.setItem('fcards_free_used','1'); }catch(e){}
       // Auto-remove from wishlist when card is collected
       var cardNum=state.cardIndex?state.cardIndex[i]:String(i+1);
       if(state.wishlist && state.wishlist[cardNum]){
